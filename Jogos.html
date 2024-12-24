@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interface Gamer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto Condensed', sans-serif;
+      background: black;
+      color: white;
+      overflow: hidden;
+      height: 100vh;
+      display: grid;
+      grid-template-rows: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background-size: cover;
+      background-position: center;
+      transition: background-image 0.8s ease-in-out;
+    }
+
+    .container {
+      grid-column: 1 / 4;
+      grid-row: 3 / 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .details {
+      grid-column: 1 / 3; /* Ocupa os 1º e 2º quadrados da linha do meio */
+      grid-row: 2 / 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+
+    .details h1 {
+      font-size: 2em;
+      margin: 0;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8); /* Sombra */
+      color: white;
+      border: 1px solid rgba(0, 0, 0, 0.8); /* Borda preta muito sutil */
+      padding: 5px 10px;
+    }
+
+    .options {
+      display: flex;
+      gap: 20px;
+    }
+
+    .option {
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease-in-out, transform 0.2s;
+    }
+
+    .option:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+
+    .carousel {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 20px;
+      padding: 10px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .carousel::before {
+      content: "";
+      flex: 0 0 20px;
+    }
+
+    .game {
+      flex-shrink: 0;
+      width: 120px;
+      height: 120px;
+      cursor: pointer;
+      transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+      scroll-snap-align: center;
+    }
+
+    .game img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+    }
+
+    .game.active {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+
+    .game:not(.active) {
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="background" id="background"></div>
+
+  <!-- Detalhes -->
+  <div class="details">
+    <h1 id="game-title">The Last of Us: Part II</h1>
+    <div class="options">
+      <div class="option">Play</div>
+      <div class="option">Details</div>
+      <div class="option">More Info</div>
+    </div>
+  </div>
+
+  <!-- Carrossel -->
+  <div class="container">
+    <div class="carousel" id="carousel">
+      <!-- The Last of Us -->
+      <div class="game active" data-title="The Last of Us: Part II" data-bg="images/tloubg.jpg">
+        <img src="images/tlou.jpg" alt="The Last of Us: Part II">
+      </div>
+      <!-- GTA V -->
+      <div class="game" data-title="GTA V" data-bg="images/gta1.jpg">
+        <img src="images/gta.jpg" alt="GTA V">
+      </div>
+      <!-- FC 24 -->
+      <div class="game" data-title="FC 24" data-bg="images/fcbg.jpg">
+        <img src="images/fc.jpg" alt="FC 24">
+      </div>
+      <!-- F1 24 -->
+      <div class="game" data-title="F1 24" data-bg="images/f1bg.jpg">
+        <img src="images/f1.jpg" alt="F1 24">
+      </div>
+      <!-- Call of Duty -->
+      <div class="game" data-title="Call of Duty" data-bg="images/codbg.jpg">
+        <img src="images/cod.jpg" alt="Call of Duty">
+      </div>
+      <!-- Gran Turismo 7 -->
+      <div class="game" data-title="Gran Turismo 7" data-bg="images/gtbg.jpg">
+        <img src="images/gt.jpg" alt="Gran Turismo 7">
+      </div>
+      <!-- Minecraft -->
+      <div class="game" data-title="Minecraft" data-bg="images/minecraftbg.jpg">
+        <img src="images/minecraft.jpg" alt="Minecraft">
+      </div>
+      <!-- Spider-Man -->
+      <div class="game" data-title="Spider-Man" data-bg="images/sp1.jpg">
+        <img src="images/sp.jpg" alt="Spider-Man">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const carousel = document.getElementById("carousel");
+    const background = document.getElementById("background");
+    const gameTitle = document.getElementById("game-title");
+    const games = document.querySelectorAll(".game");
+
+    function updateDetails(game) {
+      const bgImage = game.getAttribute("data-bg");
+      const title = game.getAttribute("data-title");
+
+      background.style.backgroundImage = `url(${bgImage})`;
+      gameTitle.textContent = title;
+    }
+
+    games.forEach((game) => {
+      game.addEventListener("click", () => {
+        games.forEach((g) => g.classList.remove("active"));
+        game.classList.add("active");
+        updateDetails(game);
+      });
+    });
+  </script>
+</body>
+</html>
