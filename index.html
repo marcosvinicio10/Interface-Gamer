@@ -19,7 +19,7 @@
       overflow: hidden;
       height: 100vh;
       display: grid;
-      grid-template-rows: 1fr 1fr auto;
+      grid-template-rows: 1fr auto auto;
       grid-template-columns: 1fr 1fr 1fr;
     }
 
@@ -42,62 +42,31 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(to right, rgba(20, 50, 80, 0.8), rgba(200, 200, 200, 0), rgba(30, 20, 30, 0.8));
+      background: linear-gradient(to right, rgba(20, 50, 80, 0.6), rgba(200, 200, 200, 0), rgba(30, 20, 30, 0.6));
       pointer-events: none;
-    }
-    
-    .background::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 20%;
-      background: linear-gradient(
-      to top,
-      rgba(50, 120, 170, 0.3), 
-      rgba(0, 0, 0, 0) 50% 
-      ), 
-      linear-gradient(
-      to right,
-      rgba(30, 140, 200, 0.5), 
-      rgba(0, 0, 0, 0) 50% 
-      );
-      backdrop-filter: blur(10px);
-      pointer-events: none;
-}
-
-
-
-    .container {
-      grid-column: 1 / 4;
-      grid-row: 3 / 4;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .details {
-      grid-column: 1 / 3;
-      grid-row: 2 / 3;
+      grid-column: 1 / 4;
+      grid-row: 2 / 3 ;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      padding: 0 20px;
+      justify-content: center;
+      text-align: center;
     }
 
     .details h1 {
-      font-size: 2em;
-      margin: 0;
+      font-size: 2.5em;
       text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
       color: white;
-      border: 1px solid rgba(0, 0, 0, 0.8);
       padding: 5px 10px;
     }
 
     .options {
       display: flex;
       gap: 20px;
+      margin-top: 10px;
     }
 
     .option {
@@ -121,25 +90,25 @@
       transform: scale(1.1);
     }
 
-    .carousel {
+    .container {
+      grid-column: 1 / 4;
+      grid-row: 3 / 4;
       display: flex;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      gap: 20px;
-      padding: 10px;
+      align-items: center;
       justify-content: center;
-      width: 100%;
+      overflow: hidden;
     }
 
-    .carousel::before {
-      content: "";
-      flex: 0 0 20px;
+    .carousel {
+      display: flex;
+      gap: 35px;
+      transition: transform 0.6s ease-in-out;
     }
 
     .game {
       flex-shrink: 0;
-      width: 120px;
-      height: 120px;
+      width: 150px;
+      height: 150px;
       cursor: pointer;
       transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
       scroll-snap-align: center;
@@ -166,7 +135,6 @@
 <body>
   <div class="background" id="background"></div>
 
-  <!-- Detalhes -->
   <div class="details">
     <h1 id="game-title">The Last of Us: Part II</h1>
     <div class="options">
@@ -176,7 +144,6 @@
     </div>
   </div>
 
-  <!-- Carrossel -->
   <div class="container">
     <div class="carousel" id="carousel">
       <div class="game active" data-title="The Last of Us: Part II" data-bg="images/tloubg.jpg">
@@ -208,22 +175,40 @@
 
   <script>
     const carousel = document.getElementById("carousel");
+    const games = document.querySelectorAll(".game");
     const background = document.getElementById("background");
     const gameTitle = document.getElementById("game-title");
-    const games = document.querySelectorAll(".game");
     const options = document.querySelectorAll(".option");
 
     function updateDetails(game) {
       const bgImage = game.getAttribute("data-bg");
       const title = game.getAttribute("data-title");
-
       background.style.backgroundImage = `url(${bgImage})`;
       gameTitle.textContent = title;
 
       options.forEach((option, index) => {
         option.classList.remove("show");
-        setTimeout(() => option.classList.add("show"), index * 150); // Aumentado o tempo de intervalo
+        setTimeout(() => option.classList.add("show"), index * 150);
       });
+    }
+
+    function centerActiveGame() {
+      const activeGame = document.querySelector(".game.active");
+      const activeGameIndex = [...games].indexOf(activeGame);
+      const offset = activeGameIndex * (games[0].offsetWidth + 35); // Inclui espaçamento
+      const containerCenter = carousel.offsetWidth / 2 - games[0].offsetWidth / 2;
+      carousel.style.transform = `translateX(${containerCenter - offset}px)`;
+    }
+
+    function navigate(direction) {
+      const activeGame = document.querySelector(".game.active");
+      const activeGameIndex = [...games].indexOf(activeGame);
+      const newIndex = (activeGameIndex + direction + games.length) % games.length;
+
+      games.forEach((game) => game.classList.remove("active"));
+      games[newIndex].classList.add("active");
+      updateDetails(games[newIndex]);
+      centerActiveGame();
     }
 
     games.forEach((game) => {
@@ -231,7 +216,15 @@
         games.forEach((g) => g.classList.remove("active"));
         game.classList.add("active");
         updateDetails(game);
+        centerActiveGame();
       });
+    });
+
+    window.addEventListener("load", centerActiveGame);
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") navigate(-1);
+      if (e.key === "ArrowRight") navigate(1);
     });
   </script>
 </body>
